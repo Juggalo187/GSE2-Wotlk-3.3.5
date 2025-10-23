@@ -361,6 +361,7 @@ self:SetAttribute('loopiter', loopiter)
 self:SetAttribute('clicks', clicks)
 self:SetAttribute('ms', ms)
 self:SetAttribute('limit', limit)
+self:SetAttribute("updateicon", true)
 --self:CallMethod('UpdateIcon')
 ]=]
 

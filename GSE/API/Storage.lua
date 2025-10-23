@@ -360,28 +360,23 @@ end
 function GSE.CreateMacroIcon(sequenceName, icon, forceglobalstub)
     local sequenceIndex = GetMacroIndexByName(sequenceName)
     local numAccountMacros, numCharacterMacros = GetNumMacros()
-    if sequenceIndex > 0 then
-        -- Sequence exists, do nothing
-        GSE.PrintDebugMessage("Moving on - macro for " .. sequenceName .. " already exists.", GNOME)
+    
+    if sequenceIndex and sequenceIndex > 0 then
+        -- Macro exists, update icon if needed
+        local currentName, currentIcon = GetMacroInfo(sequenceIndex)
+        if currentIcon == "INV_MISC_QUESTIONMARK" or currentIcon == Statics.QuestionMark then
+            EditMacro(sequenceIndex, nil, icon or Statics.QuestionMark)
+        end
+        GSE.PrintDebugMessage("Updating macro icon for " .. sequenceName, GNOME)
     else
-        -- Create Sequence as a player sequence
+        -- Create new macro with proper icon
         if numCharacterMacros >= MAX_CHARACTER_MACROS and not GSEOptions.overflowPersonalMacros and not forceglobalstub then
-            GSE.Print(
-                GSEOptions.AuthorColour .. L["Close to Maximum Personal Macros.|r  You can have a maximum of "] ..
-                    MAX_CHARACTER_MACROS .. L[" macros per character.  You currently have "] ..
-                    GSEOptions.EmphasisColour .. numCharacterMacros ..
-                    L["|r.  As a result this macro was not created.  Please delete some macros and reenter "] ..
-                    GSEOptions.CommandColour .. L["/gs|r again."], GNOME)
+            GSE.Print(GSEOptions.AuthorColour .. L["Close to Maximum Personal Macros.|r  You can have a maximum of "] .. MAX_CHARACTER_MACROS .. L[" macros per character.  You currently have "] .. GSEOptions.EmphasisColour .. numCharacterMacros .. L["|r.  As a result this macro was not created.  Please delete some macros and reenter "] .. GSEOptions.CommandColour .. L["/gs|r again."], GNOME)
         elseif numAccountMacros >= MAX_ACCOUNT_MACROS and GSEOptions.overflowPersonalMacros then
-            GSE.Print(L["Close to Maximum Macros.|r  You can have a maximum of "] .. MAX_CHARACTER_MACROS ..
-                          L[" macros per character.  You currently have "] .. GSEOptions.EmphasisColour ..
-                          numCharacterMacros .. L["|r.  You can also have a  maximum of "] .. MAX_ACCOUNT_MACROS ..
-                          L[" macros per Account.  You currently have "] .. GSEOptions.EmphasisColour ..
-                          numAccountMacros ..
-                          L["|r. As a result this macro was not created.  Please delete some macros and reenter "] ..
-                          GSEOptions.CommandColour .. L["/gs|r again."], GNOME)
+            GSE.Print(L["Close to Maximum Macros.|r  You can have a maximum of "] .. MAX_CHARACTER_MACROS .. L[" macros per character.  You currently have "] .. GSEOptions.EmphasisColour .. numCharacterMacros .. L["|r.  You can also have a  maximum of "] .. MAX_ACCOUNT_MACROS .. L[" macros per Account.  You currently have "] .. GSEOptions.EmphasisColour .. numAccountMacros .. L["|r. As a result this macro was not created.  Please delete some macros and reenter "] .. GSEOptions.CommandColour .. L["/gs|r again."], GNOME)
         else
-            sequenceid = CreateMacro(sequenceName, 1, GSE.CreateMacroString(sequenceName), (forceglobalstub and false or GSE.SetMacroLocation()))
+            local sequenceid = CreateMacro(sequenceName, icon or Statics.QuestionMark, GSE.CreateMacroString(sequenceName), (forceglobalstub and false or GSE.SetMacroLocation()))
+            GSE.PrintDebugMessage("Created macro with icon: " .. (icon or Statics.QuestionMark), GNOME)
         end
     end
 end
@@ -1310,52 +1305,102 @@ function GSE.LoadSampleMacros(classID)
     end
 end
 
+function GSE.btnOnUpdate(self,...)
+  local reset = self:GetAttribute("combatreset")
+  GSE.UpdateIcon(self, reset)
+end
+
 function GSE.CreateButton(name, sequence)
-    local gsebutton = CreateFrame('Button', name, nil, 'SecureActionButtonTemplate,SecureHandlerBaseTemplate')
-    gsebutton:SetAttribute('type', 'macro')
-    gsebutton.UpdateIcon = GSE.UpdateIcon
+  local gsebutton = CreateFrame('Button', name, nil, 'SecureActionButtonTemplate,SecureHandlerBaseTemplate')
+  gsebutton:SetAttribute('type', 'macro')
+  gsebutton.UpdateIcon = GSE.UpdateIcon
+  
+  -- Add the OnUpdate hook for icon updating
+  gsebutton:HookScript("OnUpdate", GSE.btnOnUpdate)
+end
+
+function GSE.GetMacroIndexByName(name)
+    for i = 1, MAX_ACCOUNT_MACROS + MAX_CHARACTER_MACROS do
+        local mname = GetMacroInfo(i)
+        if mname and mname == name then
+            return i
+        end
+    end
+    return nil
 end
 
 function GSE.UpdateIcon(self, reset)
     local step = self:GetAttribute('step') or 1
     local gsebutton = self:GetName()
     local executionseq = GSE.SequencesExec[gsebutton]
-    local commandline, foundSpell, notSpell = executionseq[step], false, ''
-    for cmd, etc in gmatch(commandline or '', '/(%w+)%s+([^\n]+)') do
-        if Statics.CastCmds[strlower(cmd)] or strlower(cmd) == "castsequence" then
+    local commandline = executionseq[step]
+    local foundSpell = false
+    
+    if not commandline then
+        return
+    end
+    
+    -- Try to find a spell in the command line
+    for cmd, etc in gmatch(commandline, '/(%w+)%s+([^\n]+)') do
+        local cmdLower = strlower(cmd)
+        
+        if Statics.CastCmds[cmdLower] then
+            -- Handle regular cast commands
             local spell, target = SecureCmdOptionParse(etc)
-            if not reset then
-                GSE.TraceSequence(gsebutton, step, spell)
+            if spell and GetSpellInfo(spell) then
+                SetMacroSpell(gsebutton, spell, target)
+                foundSpell = true
+                break
             end
-            if spell then
-                if GetSpellInfo(spell) then
-                    SetMacroSpell(gsebutton, spell, target)
+        elseif cmdLower == "castsequence" then
+            -- Handle castsequence - extract and try each spell in sequence
+            local sequenceSpells = etc
+            -- Remove reset conditions
+            sequenceSpells = sequenceSpells:gsub("reset=[^,]+", "")
+            -- Remove other modifiers
+            sequenceSpells = sequenceSpells:gsub("[nocooldown,nodead,combat,nochanneling,@[%a]+]", "")
+            
+            -- Try each spell in the sequence until we find one that works
+            for spell in gmatch(sequenceSpells, "([^,]+)") do
+                spell = spell:gsub("%[.-%]", ""):gsub("^%s*(.-)%s*$", "%1") -- Remove conditions and trim
+                if spell and spell ~= "" and GetSpellInfo(spell) then
+                    SetMacroSpell(gsebutton, spell)
                     foundSpell = true
+                    GSE.PrintDebugMessage("CastSequence icon set to: " .. spell, "Storage")
                     break
-                elseif notSpell == '' then
-                    notSpell = spell
                 end
             end
-            if strlower(cmd) == "castsequence" then
-                local index, csitem, csspell = QueryCastSequence(etc)
-                if not GSE.isEmpty(csitem) then
-                    SetMacroSpell(gsebutton, csitem, target)
-                    foundSpell = true
-                end
-                if not GSE.isEmpty(csspell) then
-                    SetMacroSpell(gsebutton, csspell, target)
-                    foundSpell = true
-                end
-            end
+            if foundSpell then break end
         end
     end
+    
+    -- If no spell found, try to set a default icon
     if not foundSpell then
-        SetMacroItem(gsebutton, notSpell)
+        -- Get the sequence name from the button name
+        local sequenceName = gsebutton
+        local classid = GSE.GetCurrentClassID()
+        local sequence = GSE.Library[classid][sequenceName]
+        
+        if not sequence and GSE.Library[0] then
+            sequence = GSE.Library[0][sequenceName]
+        end
+        
+        if sequence and sequence.Icon then
+            -- Use the sequence's defined icon
+            EditMacro(gsebutton, nil, sequence.Icon)
+            GSE.PrintDebugMessage("Using sequence defined icon: " .. sequence.Icon, "Storage")
+        else
+            -- Use default question mark
+            EditMacro(gsebutton, nil, Statics.QuestionMark)
+        end
     end
+    
     if not reset then
         GSE.UsedSequences[gsebutton] = true
     end
 end
+
+
 
 function GSE.PrepareKeyPress(sequence)
 

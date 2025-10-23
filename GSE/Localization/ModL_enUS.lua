@@ -46,7 +46,7 @@ L["Sequence specID set to current spec of "] = true
 L["Sequence Author set to Unknown"] = true
 L["No Help Information Available"] = true
 L[" was imported with the following errors."] = true
-
+L["Sequence '%s' has been completely deleted."] = true
 -- 1.4 changes
 L["No Active Version"] = true
 L["Matching helpTxt"] = true
