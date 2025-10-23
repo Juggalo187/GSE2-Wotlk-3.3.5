@@ -38,5 +38,5 @@ KeyPress:
 Sequence:
  /cast [nochanneling] Mind Flay
 ```
-
+`This is a screenshot of the macro after it's Imported`
 ![image](GSE2-WOTLK.jpg)
