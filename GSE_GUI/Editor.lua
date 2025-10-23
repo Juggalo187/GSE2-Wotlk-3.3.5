@@ -19,7 +19,7 @@ editframe:Hide()
 GSE.GUIEditFrame = editframe
 editframe.Sequence = {}
 editframe.Sequence.MacroVersions = {}
-editframe.SequenceName = ""
+editframe.SequenceName = GSE.GUIEditFrame.SequenceName or ""
 GSE.PerformReloadSequences()
 editframe.Default = 1
 editframe.Raid = 1
