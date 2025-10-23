@@ -20,6 +20,8 @@ Change `SpecID: 5` to the class you want to use the macro on.
 [8] = "Mage"
 [9] = "Warlock"
 ```
+
+`Import this:`
   ```
 GSE Simple Export: TEST
 Author: Chitcagosux@Frostmourne
