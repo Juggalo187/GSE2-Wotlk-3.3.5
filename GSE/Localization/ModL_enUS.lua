@@ -19,7 +19,7 @@ L["Unknown Author|r "] = true
 L["|r Incomplete Sequence Definition - This sequence has no further information "] = true
 L["Two sequences with unknown sources found."] = true
 L["FYou cannot delete this version of a sequence.  This version will be reloaded as it is contained in "] = true
-
+L["Please enter a valid macro name before saving."] = true
 -- Setup and Help Output from Core
 L["GnomeSequencer was originally written by semlar of wowinterface.com."] = true
 L["This is a small addon that allows you create a sequence of macros to be executed at the push of a button."] = true

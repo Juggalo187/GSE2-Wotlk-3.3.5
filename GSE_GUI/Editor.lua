@@ -207,26 +207,37 @@ function GSE.GUIEditorPerformLayout(frame)
     editButtonGroup:SetHeight(15)
 
     local savebutton = AceGUI:Create("Button")
-    savebutton:SetText(L["Save"])
-    savebutton:SetWidth(150)
-    savebutton:SetCallback("OnClick", function()
-        local gameversion, build, date, tocversion = GetBuildInfo()
-        editframe.Sequence.ManualIntervention = true
-        editframe.Sequence.GSEVersion = GSE.VersionNumber
-        editframe.Sequence.EnforceCompatability = true
-        editframe.Sequence.TOC = tocversion
-        nameeditbox:SetText(string.upper(nameeditbox:GetText()))
-        editframe.SequenceName = nameeditbox:GetText()
-        GSE.GUIUpdateSequenceDefinition(editframe.ClassID, editframe.SequenceName, editframe.Sequence)
-        editframe.save = true
-        for k,v in ipairs(editframe.Sequence.MacroVersions) do
-            if table.getn(v.PostMacro) > 0 then
-                if GSE.isEmpty(v.LoopLimit) then
-                    GSE.Print(string.format(L["%sMACRO VALIDATION ERROR|r - PostMacro found with invalid LoopLimit.  PostMacro will not be saved for version %s"], GSEOptions.UNKNOWN, k))
-                end
-            end
-        end
-    end)
+	savebutton:SetText(L["Save"])
+	savebutton:SetWidth(150)
+	savebutton:SetCallback("OnClick", function()
+		local gameversion, build, date, tocversion = GetBuildInfo()
+		
+		-- Prevent saving with default/empty name
+		nameeditbox:SetText(string.upper(nameeditbox:GetText()))
+		editframe.SequenceName = nameeditbox:GetText()
+		
+		-- Check if name is empty or the default "New_Sequence"
+		if GSE.isEmpty(editframe.SequenceName) or editframe.SequenceName == "NEW_SEQUENCE" then
+			GSE.Print(L["Please enter a valid macro name before saving."])
+			editframe:SetStatusText(L["Please enter a valid macro name before saving."])
+			return
+		end
+		
+		editframe.Sequence.ManualIntervention = true
+		editframe.Sequence.GSEVersion = GSE.VersionNumber
+		editframe.Sequence.EnforceCompatability = true
+		editframe.Sequence.TOC = tocversion
+		
+		GSE.GUIUpdateSequenceDefinition(editframe.ClassID, editframe.SequenceName, editframe.Sequence)
+		editframe.save = true
+		for k,v in ipairs(editframe.Sequence.MacroVersions) do
+			if table.getn(v.PostMacro) > 0 then
+				if GSE.isEmpty(v.LoopLimit) then
+					GSE.Print(string.format(L["%sMACRO VALIDATION ERROR|r - PostMacro found with invalid LoopLimit.  PostMacro will not be saved for version %s"], GSEOptions.UNKNOWN, k))
+				end
+			end
+		end
+	end)
 
     savebutton:SetCallback('OnEnter', function()
         GSE.CreateToolTip(L["Save"], L["Save the changes made to this macro"], editframe)
