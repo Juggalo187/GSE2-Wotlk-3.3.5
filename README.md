@@ -2,9 +2,9 @@
 
 My effot to get GSE 2.6.54 working on 3.3.5 client
 
-My testing is being done on Stormforge-Frostmourne server.
+My testing is being done on `Stormforge-Frostmourne` server.
 
-You canh use the GUI to create your macro or inport/export, here is a macro you can import as an example.
+You can use the GUI to create your macro or import/export, here is a macro you can import as an example.
 
 
 If you aren't a Priest you probably want to change the spells and change `SpecID: 5` to the class you want to use the macro on. 
