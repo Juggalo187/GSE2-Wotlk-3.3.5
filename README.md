@@ -4,10 +4,10 @@ My effot to get GSE 2.6.54 working on 3.3.5 client
 
 My testing is being done on Stormforge-Frostmourne server.
 
-Here is a macro you can import as an example.
+You canh use the GUI to create your macro or inport/export, here is a macro you can import as an example.
 
 
-Change `SpecID: 5` to the class you want to use the macro on.
+If you aren't a Priest you probably want to change the spells and change `SpecID: 5` to the class you want to use the macro on. 
 
 ```
 [1] = "Warrior"
@@ -32,8 +32,8 @@ TOC: 30300
 === Version 1 ===
 KeyPress:
  /targetenemy [noharm][dead]
- /castsequence [nochanneling] reset=target/combat  Shadow Word: Pain, nullsjuly
- /castsequence [nochanneling] reset=target/combat  Devouring Plague, nullskuly
+ /castsequence [nochanneling] reset=target/combat  Shadow Word: Pain, nulloo
+ /castsequence [nochanneling] reset=target/combat  Devouring Plague, nulloo
  /castsequence [nochanneling] reset=target/combat  Mind Blast, nullskuly
 Sequence:
  /cast [nochanneling] Mind Flay
