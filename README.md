@@ -9,16 +9,17 @@ Here is a macro you can import as an example.
 
 Change `SpecID: 5` to the class you want to use the macro on.
 
-
-`[1] = "Warrior"`
-`[2] = "Paladin"`
-`[3] = "Hunter"`
-`[4] = "Rogue"`
-`[5] = "Priest"`
-`[6] = "DeathKnight"`
-`[7] = "Shaman"`
-`[8] = "Mage"`
-`[9] = "Warlock"`
+```
+[1] = "Warrior"
+[2] = "Paladin"
+[3] = "Hunter"
+[4] = "Rogue"
+[5] = "Priest"
+[6] = "DeathKnight"
+[7] = "Shaman"
+[8] = "Mage"
+[9] = "Warlock"
+```
   ```
 GSE Simple Export: TEST
 Author: Chitcagosux@Frostmourne
