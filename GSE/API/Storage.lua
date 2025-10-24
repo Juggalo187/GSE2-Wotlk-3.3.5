@@ -375,7 +375,8 @@ function GSE.CreateMacroIcon(sequenceName, icon, forceglobalstub)
         elseif numAccountMacros >= MAX_ACCOUNT_MACROS and GSEOptions.overflowPersonalMacros then
             GSE.Print(L["Close to Maximum Macros.|r  You can have a maximum of "] .. MAX_CHARACTER_MACROS .. L[" macros per character.  You currently have "] .. GSEOptions.EmphasisColour .. numCharacterMacros .. L["|r.  You can also have a  maximum of "] .. MAX_ACCOUNT_MACROS .. L[" macros per Account.  You currently have "] .. GSEOptions.EmphasisColour .. numAccountMacros .. L["|r. As a result this macro was not created.  Please delete some macros and reenter "] .. GSEOptions.CommandColour .. L["/gs|r again."], GNOME)
         else
-            local sequenceid = CreateMacro(sequenceName, icon or Statics.QuestionMark, GSE.CreateMacroString(sequenceName), (forceglobalstub and false or GSE.SetMacroLocation()))
+            --local sequenceid = CreateMacro(sequenceName, icon or Statics.QuestionMark, GSE.CreateMacroString(sequenceName), (forceglobalstub and false or GSE.SetMacroLocation()))
+			sequenceid = CreateMacro(sequenceName, 1, GSE.CreateMacroString(sequenceName), (forceglobalstub and false or GSE.SetMacroLocation()))
             GSE.PrintDebugMessage("Created macro with icon: " .. (icon or Statics.QuestionMark), GNOME)
         end
     end
