@@ -147,7 +147,7 @@ function GSE.SimpleImportSequence(importString, autoCreateIcon)
     local finalName = sequenceName
     local counter = 1
     while GSE.Library[GSE.GetCurrentClassID()] and GSE.Library[GSE.GetCurrentClassID()][finalName] do
-        finalName = sequenceName .. " " .. counter
+        finalName = sequenceName .. counter
         counter = counter + 1
     end
     

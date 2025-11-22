@@ -602,3 +602,7 @@ L["These lines are executed after the lines in the Sequence Box have been repeat
 L["This box is disabled as no Inner Loop Limit has been set.  It will never be called without it."] = true
 --2.6.44
 L["%sMACRO VALIDATION ERROR|r - PostMacro found with invalid LoopLimit.  PostMacro will not be saved for version %s"] = true
+--juggalo
+L["Highlight Text"] = "Highlight Text"
+L["Text highlighted. Press Ctrl+C to copy or Ctrl+X to cut."] = "Text highlighted. Press Ctrl+C to copy or Ctrl+X to cut."
+L["No export text to copy!"] = "No export text to copy!"

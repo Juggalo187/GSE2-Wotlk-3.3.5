@@ -24,6 +24,16 @@ function GSE.GUIConfirmDeleteSequence(classid, sequenceName)
   GSE.GUIViewFrame:Hide()
   GSE.GUIEditFrame:Hide()
   
+  -- Clear from UsedSequences to prevent UpdateIcon calls
+  if GSE.UsedSequences and GSE.UsedSequences[sequenceName] then
+    GSE.UsedSequences[sequenceName] = nil
+  end
+  
+  -- Clear execution sequence
+  if GSE.SequencesExec and GSE.SequencesExec[sequenceName] then
+    GSE.SequencesExec[sequenceName] = nil
+  end
+  
   -- Delete the macro stub first
   GSE.DeleteMacroStub(sequenceName)
   
@@ -151,6 +161,7 @@ function GSE.GUILoadEditor(key, incomingframe, recordedstring)
     GSE.GUIEditFrame.SaveButton:SetDisabled(true)
     GSE.GUIEditFrame:SetStatusText("GSE: " .. GSE.VersionString .. " " .. L["This sequence is Read Only and unable to be edited."])
   end
+  GSE.GUIEditFrame.SequenceName = sequenceName
   GSE.GUIEditFrame:Show()
 
 end
@@ -193,43 +204,44 @@ function GSE.GUIUpdateSequenceDefinition(classid, SequenceName, sequence)
       vals.sequencename = SequenceName
       vals.sequence = sequence
       vals.classid = classid
-	if GSE.GUIEditFrame.NewSequence then
-	-- More accurate check for existing sequences
-	local sequenceExists = false
-	
-	-- Check current class library
-	if GSE.Library[classid] and GSE.Library[classid][SequenceName] then
-		sequenceExists = true
-	end
-	
-	-- Check global library
-	if not sequenceExists and GSE.Library[0] and GSE.Library[0][SequenceName] then
-		sequenceExists = true
-	end
-	
-	-- Check if macro stub exists and is a GSE macro
-	if not sequenceExists then
-		local macroIndex = GetMacroIndexByName(SequenceName)
-		if macroIndex and macroIndex ~= 0 then
-		local _, _, mbody = GetMacroInfo(macroIndex)
-		local trimmedmbody = mbody:gsub("[^%w ]", "")
-		local compar = GSE.CreateMacroString(SequenceName)
-		local trimmedcompar = compar:gsub("[^%w ]", "")
-		if string.lower(trimmedmbody) == string.lower(trimmedcompar) then
-			sequenceExists = true
-		end
-		end
-	end
-	
-	if sequenceExists then
-		GSE.GUIEditFrame:SetStatusText(string.format(L["Sequence Name %s is in Use. Please choose a different name."], SequenceName))
-		GSE.GUIEditFrame.nameeditbox:SetText(GSEOptions.UNKNOWN .. GSE.GUIEditFrame.nameeditbox:GetText() .. Statics.StringReset)
-		GSE.GUIEditFrame.nameeditbox:SetFocus()
-		return
-	end
-	vals.checkmacro = true
-	GSE.GUIEditFrame.NewSequence = false
-	end
+      
+      if GSE.GUIEditFrame.NewSequence then
+        -- More accurate check for existing sequences
+        local sequenceExists = false
+        
+        -- Check current class library
+        if GSE.Library[classid] and GSE.Library[classid][SequenceName] then
+          sequenceExists = true
+        end
+        
+        -- Check global library
+        if not sequenceExists and GSE.Library[0] and GSE.Library[0][SequenceName] then
+          sequenceExists = true
+        end
+        
+        -- Check if macro stub exists and is a GSE macro
+        if not sequenceExists then
+          local macroIndex = GetMacroIndexByName(SequenceName)
+          if macroIndex and macroIndex ~= 0 then
+            local _, _, mbody = GetMacroInfo(macroIndex)
+            local trimmedmbody = mbody:gsub("[^%w ]", "")
+            local compar = GSE.CreateMacroString(SequenceName)
+            local trimmedcompar = compar:gsub("[^%w ]", "")
+            if string.lower(trimmedmbody) == string.lower(trimmedcompar) then
+              sequenceExists = true
+            end
+          end
+        end
+        
+        if sequenceExists then
+          GSE.GUIEditFrame:SetStatusText(string.format(L["Sequence Name %s is in Use. Please choose a different name."], SequenceName))
+          -- Don't modify the editbox text directly as it can cause corruption
+          -- Instead, just show the warning and return early
+          return
+        end
+        vals.checkmacro = true
+        GSE.GUIEditFrame.NewSequence = false
+      end
       table.insert(GSE.OOCQueue, vals)
       GSE.GUIEditFrame:SetStatusText(string.format(L["Sequence %s saved."], SequenceName))
     end

@@ -24,19 +24,21 @@ If you aren't a Priest you probably want to change the spells and change `SpecID
 `Import this:`
   ```
 GSE Simple Export: TEST
-Author: Chitcagosux@Frostmourne
+Author: Unknown Author
 SpecID: 5
-Talents: 
+Talents: ?,?,?,?,?,?,?
 TOC: 30300
 
 === Version 1 ===
 KeyPress:
- /targetenemy [noharm][dead]
- /castsequence [nochanneling] reset=target/combat  Shadow Word: Pain, nulloo
- /castsequence [nochanneling] reset=target/combat  Devouring Plague, nulloo
- /castsequence [nochanneling] reset=target/combat  Mind Blast, nullskuly
+  /targetenemy [noharm][dead]
+  /castsequence [nochanneling] reset=target/combat  Vampiric Touch, nullsjuly
+  /castsequence [nochanneling] reset=target/combat  Shadow Word: Pain, nullsjuly
+  /castsequence [nochanneling] reset=target/combat  Devouring Plague, nullskuly
 Sequence:
- /cast [nochanneling] Mind Flay
+  /cast [nochanneling] Mind Flay
+  /cast [nochanneling] Mind Blast
+
 ```
 `This is a screenshot of the macro after it's Imported`
 ![image](GSE2-WOTLK.jpg)

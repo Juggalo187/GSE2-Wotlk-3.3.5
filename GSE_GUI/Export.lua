@@ -20,6 +20,29 @@ exportsequencebox:DisableButton(true)
 exportsequencebox:SetFullWidth(true)
 exportframe:AddChild(exportsequencebox)
 
+-- ADD COPY BUTTON GROUP HERE
+local copyButtonGroup = AceGUI:Create("SimpleGroup")
+copyButtonGroup:SetFullWidth(true)
+copyButtonGroup:SetLayout("Flow")
+
+local copybutton = AceGUI:Create("Button")
+copybutton:SetText(L["Highlight Text"])
+copybutton:SetWidth(150)
+copybutton:SetCallback("OnClick", function()
+    local exportText = exportsequencebox:GetText()
+    if exportText and exportText ~= "" then
+        -- Just highlight all text in the export box
+        exportsequencebox.editBox:SetFocus()
+        exportsequencebox.editBox:HighlightText()
+        GSE.Print(L["Text highlighted. Press Ctrl+C to copy or Ctrl+X to cut."])
+    else
+        GSE.Print(L["No export text to copy!"])
+    end
+end)
+copyButtonGroup:AddChild(copybutton)
+
+exportframe:AddChild(copyButtonGroup)
+
 GSE.GUIExportframe = exportframe
 exportframe.ExportSequenceBox = exportsequencebox
 

@@ -8,6 +8,11 @@ local GNOME = "Storage"
 MAX_CHARACTER_MACROS=MAX_CHARACTER_MACROS or 18
 MAX_ACCOUNT_MACROS=MAX_ACCOUNT_MACROS or 120
 
+function string.trim(str)
+    if not str then return "" end
+    return str:gsub("^%s*(.-)%s*$", "%1")
+end
+
 --- Delete a sequence starting with the macro and then the sequence from the library
 function GSE.DeleteSequence(classid, sequenceName)
     -- Delete the macro stub first
@@ -1334,6 +1339,9 @@ function GSE.UpdateIcon(self, reset)
     local step = self:GetAttribute('step') or 1
     local gsebutton = self:GetName()
     local executionseq = GSE.SequencesExec[gsebutton]
+	if not executionseq then
+        return
+    end
     local commandline = executionseq[step]
     local foundSpell = false
     

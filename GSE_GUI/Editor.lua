@@ -19,7 +19,7 @@ editframe:Hide()
 GSE.GUIEditFrame = editframe
 editframe.Sequence = {}
 editframe.Sequence.MacroVersions = {}
-editframe.SequenceName = GSE.GUIEditFrame.SequenceName or ""
+editframe.SequenceName = ""
 GSE.PerformReloadSequences()
 editframe.Default = 1
 editframe.Raid = 1
@@ -210,7 +210,7 @@ function GSE.GUIEditorPerformLayout(frame)
 	savebutton:SetText(L["Save"])
 	savebutton:SetWidth(150)
 	savebutton:SetCallback("OnClick", function()
-		local gameversion, build, date, tocversion = GetBuildInfo()
+    local gameversion, build, date, tocversion = GetBuildInfo()
 		
 		-- Prevent saving with default/empty name
 		nameeditbox:SetText(string.upper(nameeditbox:GetText()))
@@ -218,6 +218,13 @@ function GSE.GUIEditorPerformLayout(frame)
 		
 		-- Check if name is empty or the default "New_Sequence"
 		if GSE.isEmpty(editframe.SequenceName) or editframe.SequenceName == "NEW_SEQUENCE" then
+			GSE.Print(L["Please enter a valid macro name before saving."])
+			editframe:SetStatusText(L["Please enter a valid macro name before saving."])
+			return
+		end
+		
+		-- Additional validation to prevent blank names
+		if string.trim(editframe.SequenceName) == "" then
 			GSE.Print(L["Please enter a valid macro name before saving."])
 			editframe:SetStatusText(L["Please enter a valid macro name before saving."])
 			return
@@ -1085,7 +1092,7 @@ function GSE.GUISelectEditorTab(container, event, group)
     if not GSE.isEmpty(container) then
         container:ReleaseChildren()
         editframe.SelectedTab = group
-        editframe.nameeditbox:SetText(GSE.GUIEditFrame.SequenceName or "")
+        editframe.nameeditbox:SetText(GSE.GUIEditFrame.SequenceName or editframe.SequenceName or "")
         editframe.iconpicker:SetImage(GSE.GetMacroIcon(editframe.ClassID, editframe.SequenceName))
         if group == "config" then
             GSE:GUIDrawMetadataEditor(container)
